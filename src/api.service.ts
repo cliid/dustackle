@@ -8,12 +8,8 @@ import { lastValueFrom } from 'rxjs';
 import { URLSearchParams } from 'url';
 
 @Injectable()
-export class AppService {
+export class ApiService {
   constructor(private readonly config: ConfigService, private httpService: HttpService) {}
-
-  hello(): string {
-    return 'Akinaldo.';
-  }
 
   async finedust(sido: string, gungu: string): Promise<string> {
     // sido: `서울` 과 같은 형식, not `서울특별시` or `서울시`
