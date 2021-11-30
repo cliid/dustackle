@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import Joi from 'joi';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -16,7 +18,10 @@ import Joi from 'joi';
         FB_WEBHOOK_VERIFY_TOKEN: Joi.string().required()
       })
     }),
-    ConfigService
+    ConfigService,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client')
+    })
   ],
   controllers: [AppController],
   providers: [AppService]
