@@ -14,14 +14,14 @@ export class AppService {
 
   login(@Body() body): Record<string, unknown> {
     return {
-      access_token: this.config.get('FB_MESSENGER_ACCESS_TOKEN'),
+      access_token: '',
       love: true
     };
   }
 
   register(@Body() body): Record<string, unknown> {
     return {
-      access_token: this.config.get('FB_MESSENGER_ACCESS_TOKEN'),
+      access_token: '',
       love: false
     };
   }
