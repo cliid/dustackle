@@ -35,13 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # Environment Variables
-.env
-.env.local
 .env.development
-.env.test
 .env.production
-.env.development.local
-.env.test.local
-.env.production.local
 
 .vercel

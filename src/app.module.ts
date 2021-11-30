@@ -12,12 +12,9 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'development' ? '.env.development' : '.env.test',
-      ignoreEnvFile: process.env.NODE_ENV === 'production', // When production stage, we'll use Vercel's own Environment Variable settings.
+      envFilePath: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('development', 'production', 'test').required(),
-        FB_MESSENGER_ACCESS_TOKEN: Joi.string().required(),
-        FB_WEBHOOK_VERIFY_TOKEN: Joi.string().required()
+        NODE_ENV: Joi.string().valid('development', 'production').required()
       })
     }),
     ConfigService,

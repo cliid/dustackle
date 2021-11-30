@@ -146,7 +146,7 @@ export class AppService {
       console.log(`Message: ${message}, from User: ${userId}`);
       this.nlp(message);
       const sido = '서울',
-        gungu = '송파구';
+        gungu = '강남구';
       return await this.finedust(sido, gungu);
     }
   }
