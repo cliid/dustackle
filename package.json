@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -w",
-    "dev": "nodemon build/index.js",
+    "build": "tsc",
+    "build:dev": "tsc -w",
     "start": "node build/index.js",
+    "start:dev": "nodemon build/index.js",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "prepare": "husky install"
