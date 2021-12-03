@@ -24,6 +24,15 @@ const APIRoute = async (server: FastifyInstance) => {
     }
   });
 
+  server.post<{ Body: { text: string } }>('/dustackle', {}, async (req, res) => {
+    try {
+      res.code(200).send(await dustackle(req.body.text));
+    } catch (error) {
+      req.log.error(`API --- ${error}`);
+      res.send(500);
+    }
+  });
+
   // Facebook Messenger Webhook
   server.post<{ Body: WebhookAttr }>('/webhook', {}, async (req, res) => {
     try {
