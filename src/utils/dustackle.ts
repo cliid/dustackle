@@ -41,11 +41,38 @@ const dustackle = async (request: string): Promise<string> => {
       const finedustData = await finedust(stationName);
       return beautifier(finedustData);
     }
-    case 'DefaultFinedust': {
+    case 'Default Finedust': {
       return '조금만 더 자세히 말씀해주시면 감사하겠습니다 ;)';
     }
+    case 'Famous Quotes': {
+      const quotes = [
+        {
+          quotation: "“If you don't make mistakes, you're not working on hard enough problems. And that's a mistake.”",
+          author: 'Frank Wilczek',
+        },
+        {
+          quotation: '“It does not matter how slowly you go as long as you do not stop.”',
+          author: 'Confucius',
+        },
+        {
+          quotation: 'Only I can change my life. No one can do it for me.”',
+          author: 'Carol Burnett',
+        },
+        {
+          quotation:
+            '“With software there are only two possibilites: either the users control the programme or the programme controls the users. If the programme controls the users, and the developer controls the programme, then the programme is an instrument of unjust power.”',
+          author: 'Richard “Matthew” Stallman',
+        },
+        {
+          quotation: "“People said I should accept the world. Bullshit! I don't accept the world.”",
+          author: 'Richard “Matthew” Stallman',
+        },
+      ];
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      return `${quote.quotation}\n\n— ${quote.author}`;
+    }
     default:
-      return '뭐라고 말씀하셨는지 다시 한번 더 정확히 말씀해주세요... ㅠ';
+      return '잘 이해를 못하겠어요... :(';
   }
 };
 

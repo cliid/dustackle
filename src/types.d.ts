@@ -6,23 +6,42 @@ export interface NLPAttr {
   text: string;
 }
 
-export interface WebhookAttr {
-  object?: string;
-  entry?: [{ messaging: Array<string> }];
+export interface Attachment {
+  type: string;
+  payload: {
+    url: string;
+    title?: string;
+  };
+}
+
+export interface Messaging {
   sender: {
     id: string;
   };
   recipient: {
     id: string;
   };
-  timestamp: number;
-  message: {
-    mid: string; // message id
+  timestamp?: number;
+  message?: {
+    mid: string;
     text: string;
+    quick_reply?: {
+      payload: string;
+    };
     reply_to?: {
       mid: string;
     };
+    attachments?: Array<Attachment>;
   };
+  delivery?: {
+    mids: Array<string>;
+    watermark: number;
+  };
+}
+
+export interface WebhookAttr {
+  object: string;
+  entry: Array<{ messaging: Array<Messaging>; id: string; time: number }>;
 }
 
 export interface WebhookQuerystring {

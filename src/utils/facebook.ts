@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const send = (senderPSID: string, payload: string) => {
+const sendText = (senderPSID: string, text: string) => {
   axios.post(
-    `https://graph.facebook.com/v2.6/me/messages?${new URLSearchParams({
+    `https://graph.facebook.com/v12.0/me/messages?${new URLSearchParams({
       access_token: process.env.FB_MESSENGER_ACCESS_TOKEN!,
     })}`,
     {
@@ -10,10 +10,10 @@ const send = (senderPSID: string, payload: string) => {
         id: senderPSID,
       },
       message: {
-        text: payload,
+        text,
       },
     }
   );
 };
 
-export default { send };
+export default { sendText };

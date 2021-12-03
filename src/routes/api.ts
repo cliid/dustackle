@@ -3,7 +3,7 @@ import { FinedustAttr, WebhookAttr, NLPAttr, WebhookQuerystring } from '../types
 import dustackle from '../utils/dustackle';
 import finedust from '../utils/finedust';
 import nlp from '../utils/nlp';
-import Facebook from '../utils/facebook';
+import facebook from '../utils/facebook';
 
 const APIRoute = async (server: FastifyInstance) => {
   server.post<{ Body: FinedustAttr }>('/finedust', {}, async (req, res) => {
@@ -37,26 +37,26 @@ const APIRoute = async (server: FastifyInstance) => {
   server.post<{ Body: WebhookAttr }>('/webhook', {}, async (req, res) => {
     try {
       if (req.body.object === 'page') {
+        // Just to be sure...
         // Iterates over each entry - there may be multiple if batched
-        req.body.entry!.forEach((entry) => {
+        req.body.entry!.forEach(async (entry) => {
           // Gets the message. entry.messaging is an array, but
           // will only ever contain one message, so we get index 0
-          const webhookEvent = entry.messaging[0];
-          console.log(webhookEvent);
+          const senderID = entry.messaging[0].sender.id;
+          if (entry.messaging[0].message) {
+            // If it's a normal message, a.k.a. from the `messages` webhook.
+            const { message } = entry.messaging[0];
+            console.log(`API --- Message: ${message.text}, from User: ${senderID}`);
+
+            const response = await dustackle(message.text);
+            facebook.sendText(senderID, response);
+            res.code(200).send(response);
+          } else {
+            // From `message_deliveries`
+            // TODO
+          }
         });
-
-        // Returns a '200 OK' response to all requests
-        res.code(200).send('EVENT_RECEIVED');
-        return;
       }
-      // If it's not from a page, and rather directly from the messenger...
-      const senderID = req.body.sender.id;
-      const message = req.body.message.text;
-      console.log(`API --- Message: ${message}, from User: ${senderID}`);
-
-      const response = await dustackle(message);
-      Facebook.send(senderID, response);
-      res.code(200).send(response);
     } catch (error) {
       req.log.error(`API --- ${error}`);
       res.send(500);
