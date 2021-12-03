@@ -1,10 +1,8 @@
 import Fastify from 'fastify';
 import { fastifyEnv } from 'fastify-env';
-import pino from 'pino';
+import logger from './logger';
 
-const fastify = Fastify({
-  logger: pino({ level: 'info' }),
-});
+const fastify = Fastify({ logger });
 
 const schema = {
   type: 'object',

@@ -4,13 +4,14 @@ import dustackle from '../utils/dustackle';
 import finedust from '../utils/finedust';
 import nlp from '../utils/nlp';
 import facebook from '../utils/facebook';
+import logger from '../logger';
 
 const APIRoute = async (server: FastifyInstance) => {
   server.post<{ Body: FinedustAttr }>('/finedust', {}, async (req, res) => {
     try {
       res.code(200).send(await finedust(req.body.stationName));
     } catch (error) {
-      req.log.error(`API --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -19,7 +20,7 @@ const APIRoute = async (server: FastifyInstance) => {
     try {
       res.code(200).send(await nlp(req.body.text));
     } catch (error) {
-      req.log.error(`API --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -28,7 +29,7 @@ const APIRoute = async (server: FastifyInstance) => {
     try {
       res.code(200).send(await dustackle(req.body.text));
     } catch (error) {
-      req.log.error(`API --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -46,11 +47,16 @@ const APIRoute = async (server: FastifyInstance) => {
           if (entry.messaging[0].message) {
             // If it's a normal message, a.k.a. from the `messages` webhook.
             const { message } = entry.messaging[0];
-            console.log(`API --- Message: ${message.text}, from User: ${senderID}`);
-
-            const response = await dustackle(message.text);
-            facebook.sendText(senderID, response);
-            res.code(200).send(response);
+            logger.info(`Message: ${message.text}, from User: ${senderID}`);
+            try {
+              const response = await dustackle(message.text);
+              facebook.sendText(senderID, response);
+              res.code(200).send(response);
+            } catch (error) {
+              logger.error(error);
+              facebook.sendText(senderID, '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
+              res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
+            }
           } else {
             // From `message_deliveries`
             // TODO
@@ -58,7 +64,7 @@ const APIRoute = async (server: FastifyInstance) => {
         });
       }
     } catch (error) {
-      req.log.error(`API --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -78,7 +84,7 @@ const APIRoute = async (server: FastifyInstance) => {
         // Checks the mode and token sent is correct
         if (mode === 'subscribe' && token === VERIFY_TOKEN) {
           // Responds with the challenge token from the request
-          console.log('API --- WEBHOOK_VERIFIED');
+          logger.info('WEBHOOK_VERIFIED');
           res.code(200).send(challenge);
         } else {
           // Responds with '403 Forbidden' if verify tokens do not match
@@ -86,7 +92,7 @@ const APIRoute = async (server: FastifyInstance) => {
         }
       }
     } catch (error) {
-      req.log.error(`API --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });

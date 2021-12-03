@@ -1,15 +1,16 @@
+import logger from '../logger';
 import dialogflow from './dialogflow';
 
 const nlp = async (text: string) => {
   const response = await dialogflow(text, 'ko-KR');
-  console.log('NLP --- Detected intent');
+  logger.info('Detected intent');
   const result = response.queryResult!;
-  console.log(`NLP ---   Query: ${result.queryText}`);
-  console.log(`NLP ---   Response: ${result.fulfillmentText}`);
+  logger.info(`  Query: ${result.queryText}`);
+  logger.info(`  Response: ${result.fulfillmentText}`);
   if (result.intent) {
-    console.log(`NLP ---   Intent: ${result.intent.displayName}`);
+    logger.info(`  Intent: ${result.intent.displayName}`);
   } else {
-    console.log('NLP ---   No intent matched.');
+    logger.error('  No intent matched.');
   }
   return result;
 };

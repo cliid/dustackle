@@ -1,11 +1,12 @@
 import { FastifyInstance } from 'fastify';
+import logger from '../logger';
 
 const StaticRoute = async (server: FastifyInstance) => {
   server.get('/', {}, async (req, res) => {
     try {
       res.code(200).send(`Akinaldo.`);
     } catch (error) {
-      req.log.error(`STATIC --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -80,7 +81,7 @@ const StaticRoute = async (server: FastifyInstance) => {
             
             </html>`);
     } catch (error) {
-      req.log.error(`STATIC --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });
@@ -138,7 +139,7 @@ const StaticRoute = async (server: FastifyInstance) => {
             </html>
             `);
     } catch (error) {
-      req.log.error(`STATIC --- ${error}`);
+      logger.error(error);
       res.send(500);
     }
   });

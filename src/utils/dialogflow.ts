@@ -1,7 +1,8 @@
+import logger from '../logger';
 import { sessionClient, sessionId } from './session';
 
 async function dialogflow(query: string, languageCode: string, contexts?: string[]) {
-  console.log(`DIALOGFLOW --- Query: ${query}`);
+  logger.info(`Query: ${query}`);
   // The path to identify the agent that owns the created intent.
   const sessionPath = sessionClient.projectAgentSessionPath(process.env.DIALOGFLOW_PROJECT_ID!, sessionId);
 

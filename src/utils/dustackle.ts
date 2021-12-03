@@ -4,6 +4,7 @@ import finedust from './finedust';
 import beautifier from './beautifier';
 import station from './station';
 import search from './search';
+import logger from '../logger';
 
 const defaultResponse = '엣... 제대로 알아듣지 못한 것 같아요 ㅜ 한번 다시 간략하게 물어봐주시겠어요?';
 
@@ -20,7 +21,7 @@ const dustackle = async (request: string): Promise<string> => {
 
       const searchData = await search(location);
 
-      if (!searchData || !searchData.response.result.items) {
+      if (searchData.response.status === 'NOT_FOUND') {
         return defaultResponse;
       }
 
@@ -29,7 +30,7 @@ const dustackle = async (request: string): Promise<string> => {
         y: parseFloat(searchData.response.result.items[0].point.y),
       };
 
-      console.log(`API --- WGS84: ${wgs84.x}, ${wgs84.y}`);
+      logger.info(`WGS84: ${wgs84.x}, ${wgs84.y}`);
 
       proj4.defs(
         'TM',
@@ -38,7 +39,7 @@ const dustackle = async (request: string): Promise<string> => {
 
       const utm = proj4('WGS84', 'TM').forward({ x: wgs84.x, y: wgs84.y });
 
-      console.log(`API --- UTM: ${utm.x}, ${utm.y}`);
+      logger.info(`UTM: ${utm.x}, ${utm.y}`);
 
       const stationData = await station(utm);
       const { stationName } = stationData.response.body.items[0];
