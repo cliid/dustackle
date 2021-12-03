@@ -1,13 +1,11 @@
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import { fastifyEnv } from 'fastify-env';
-import pino from 'pino';
+import logger from '../logger';
 
 dotenv.config();
 
-const fastify = Fastify({
-  logger: pino({ level: 'info' }),
-});
+const fastify = Fastify({ logger });
 
 const schema = {
   type: 'object',
@@ -59,8 +57,8 @@ const options = {
 const initialize = async () => {
   fastify.register(fastifyEnv, options);
   await fastify.after();
-  fastify.register(import('../src/routes/api'), { prefix: '/api' });
-  fastify.register(import('../src/routes/static'));
+  fastify.register(import('../routes/api'), { prefix: '/api' });
+  fastify.register(import('../routes/static'));
 };
 initialize();
 
