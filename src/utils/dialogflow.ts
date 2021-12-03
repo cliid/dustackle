@@ -1,11 +1,9 @@
 import { sessionClient, sessionId } from './session';
 
-async function detectIntent(query: string, languageCode: string, contexts?: string[]) {
+async function dialogflow(query: string, languageCode: string, contexts?: string[]) {
+  console.log(`DIALOGFLOW --- Query: ${query}`);
   // The path to identify the agent that owns the created intent.
-  const sessionPath = sessionClient.projectAgentSessionPath(
-    process.env.DIALOGFLOW_PROJECT_ID,
-    sessionId
-  );
+  const sessionPath = sessionClient.projectAgentSessionPath(process.env.DIALOGFLOW_PROJECT_ID!, sessionId);
 
   // The text query request.
   let request: Record<string, any> = {
@@ -13,17 +11,17 @@ async function detectIntent(query: string, languageCode: string, contexts?: stri
     queryInput: {
       text: {
         text: query,
-        languageCode: languageCode
-      }
-    }
+        languageCode,
+      },
+    },
   };
 
   if (contexts && contexts.length > 0) {
     request = {
       ...request,
       queryParams: {
-        contexts: contexts
-      }
+        contexts,
+      },
     };
   }
 
@@ -31,4 +29,4 @@ async function detectIntent(query: string, languageCode: string, contexts?: stri
   return responses[0];
 }
 
-export { detectIntent };
+export default dialogflow;

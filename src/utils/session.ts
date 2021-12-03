@@ -1,16 +1,20 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 import dialogflow from '@google-cloud/dialogflow';
 import { SessionsClient } from '@google-cloud/dialogflow/build/src/v2';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const uuid = require('uuid');
+import * as uuid from 'uuid';
 
 declare global {
-  // eslint-disable-next-line no-var
   var sessionClient: SessionsClient | undefined;
-  // eslint-disable-next-line no-var
   var sessionId: string | undefined;
 }
 
-const sessionClient = global.sessionClient || new dialogflow.SessionsClient({});
-const sessionId = global.sessionId || uuid.v4();
+const sessionClient =
+  globalThis.sessionClient ||
+  new dialogflow.SessionsClient({
+    credentials: JSON.parse(process.env.DIALOGFLOW_CREDENTIALS!),
+  });
+const sessionId = globalThis.sessionId || uuid.v4();
 
 export { sessionId, sessionClient };

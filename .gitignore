@@ -35,7 +35,12 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # Environment Variables
+.env
+.env.local
 .env.development
 .env.production
 
 .vercel
+
+.eslintcache
+tsconfig.tsbuildinfo
