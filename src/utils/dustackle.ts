@@ -5,7 +5,7 @@ import beautifier from './beautifier';
 import station from './station';
 import search from './search';
 
-const defaultResponse = '조금만 더 자세히 말씀해주시면 감사하겠습니다 ;)';
+const defaultResponse = '엣... 제대로 알아듣지 못한 것 같아요 ㅜ 한번 다시 간략하게 물어봐주시겠어요?';
 
 const dustackle = async (request: string): Promise<string> => {
   const result = await nlp(request);
@@ -19,6 +19,10 @@ const dustackle = async (request: string): Promise<string> => {
       }
 
       const searchData = await search(location);
+
+      if (!searchData || !searchData.response.result.items) {
+        return defaultResponse;
+      }
 
       const wgs84 = {
         x: parseFloat(searchData.response.result.items[0].point.x),
@@ -42,34 +46,34 @@ const dustackle = async (request: string): Promise<string> => {
       return beautifier(finedustData);
     }
     case 'Default Finedust': {
-      return '조금만 더 자세히 말씀해주시면 감사하겠습니다 ;)';
+      return '구현중입니다!';
     }
     case 'Famous Quotes': {
       const quotes = [
         {
-          quotation: "“If you don't make mistakes, you're not working on hard enough problems. And that's a mistake.”",
+          quotation: "If you don't make mistakes, you're not working on hard enough problems. And that's a mistake.",
           author: 'Frank Wilczek',
         },
         {
-          quotation: '“It does not matter how slowly you go as long as you do not stop.”',
+          quotation: 'It does not matter how slowly you go as long as you do not stop.',
           author: 'Confucius',
         },
         {
-          quotation: 'Only I can change my life. No one can do it for me.”',
+          quotation: 'Only I can change my life. No one can do it for me.',
           author: 'Carol Burnett',
         },
         {
           quotation:
-            '“With software there are only two possibilites: either the users control the programme or the programme controls the users. If the programme controls the users, and the developer controls the programme, then the programme is an instrument of unjust power.”',
+            'With software there are only two possibilites: either the users control the programme or the programme controls the users. If the programme controls the users, and the developer controls the programme, then the programme is an instrument of unjust power.',
           author: 'Richard “Matthew” Stallman',
         },
         {
-          quotation: "“People said I should accept the world. Bullshit! I don't accept the world.”",
+          quotation: "People said I should accept the world. Bullshit! I don't accept the world.",
           author: 'Richard “Matthew” Stallman',
         },
       ];
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
-      return `${quote.quotation}\n\n— ${quote.author}`;
+      return `“${quote.quotation}”\n\n— ${quote.author}`;
     }
     default:
       return '잘 이해를 못하겠어요... :(';
