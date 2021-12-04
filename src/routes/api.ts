@@ -80,13 +80,16 @@ const APIRoute = async (server: FastifyInstance) => {
               logger.error(error0);
             }
           }
-          // No matter what, send code 200. (Facebook says to do so...)
-          res.code(200).send('EVENT_RECEIVED');
         } else {
-          // Return a '404 Not Found' if event is not from a page subscription
-          res.code(404).send('404 Not Found');
+          // From `message_deliveries`
+          // TODO
         }
       });
+
+      // No matter what, send code 200. (Facebook says to do so...)
+      res.code(200).send('EVENT_RECEIVED');
+    } else {
+      res.code(404).send('404 Not Found');
     }
   });
 
