@@ -71,7 +71,7 @@ const APIRoute = async (server: FastifyInstance) => {
                 const { message } = entry.messaging[0];
                 logger.info(`Message: ${message.text}, from User: ${recipientID}`);
                 try {
-                  const response = await messenger(message.text);
+                  const response = await messenger(message.text, recipientID);
                   await facebook.sendText(recipientID, response);
                 } catch (error) {
                   logger.error(error);
