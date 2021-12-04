@@ -39,7 +39,7 @@ const APIRoute = async (server: FastifyInstance) => {
       res.code(200).send(await messenger(req.body.text));
     } catch (error) {
       logger.error(error);
-      res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
+      res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다.');
     }
   });
 
@@ -77,7 +77,7 @@ const APIRoute = async (server: FastifyInstance) => {
                   logger.error(error);
                   await facebook.sendText(
                     recipientID,
-                    '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.'
+                    '내부적으로 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다.'
                   );
                 }
               } else {
