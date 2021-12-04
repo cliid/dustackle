@@ -24,6 +24,6 @@
     "allowUnusedLabels": false,
     "skipLibCheck": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "ecosystem.config.js"],
   "exclude": ["node_modules"]
 }
