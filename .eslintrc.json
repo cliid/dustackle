@@ -10,9 +10,12 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["simple-import-sort", "unused-imports", "@typescript-eslint"],
   "rules": {
     "radix": "off",
-    "import/extensions": "off"
+    "import/extensions": "off",
+    "unused-imports/no-unused-imports": "error",
+    "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": "error"
   }
 }
