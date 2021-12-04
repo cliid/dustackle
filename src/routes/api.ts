@@ -54,47 +54,39 @@ const APIRoute = async (server: FastifyInstance) => {
       }>;
     };
   }>('/webhook', {}, async (req, res) => {
-    try {
-      if (req.body.object === 'page') {
-        // Just to be sure... it should be `page` for sure.
-        // Iterates over each entry - there may be multiple if batched
-        req.body.entry!.forEach(async (entry) => {
-          // Gets the message. entry.messaging is an array, but
-          // will only ever contain one message, so we get index 0
-          const recipientID = entry.messaging[0].sender.id;
-          // He's the person who gets the message.
-          if (entry.messaging[0].message) {
-            // If it's a normal message, a.k.a. from the `messages` webhook.
-            const { message } = entry.messaging[0];
-            logger.info(`Message: ${message.text}, from User: ${recipientID}`);
+    if (req.body.object === 'page') {
+      // Just to be sure... it should be `page` for sure.
+      // Iterates over each entry - there may be multiple if batched
+      req.body.entry!.forEach(async (entry) => {
+        // Gets the message. entry.messaging is an array, but
+        // will only ever contain one message, so we get index 0
+        const recipientID = entry.messaging[0].sender.id;
+        // He's the person who gets the message.
+        if (entry.messaging[0].message) {
+          // If it's a normal message, a.k.a. from the `messages` webhook.
+          const { message } = entry.messaging[0];
+          logger.info(`Message: ${message.text}, from User: ${recipientID}`);
+          try {
+            const response = await messenger(message.text);
+            await facebook.sendText(recipientID, response);
+          } catch (error) {
+            logger.error(error);
             try {
-              const response = await messenger(message.text);
-              await facebook.sendText(recipientID, response);
-            } catch (error) {
-              logger.error(error);
-              try {
-                await facebook.sendText(
-                  recipientID,
-                  '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.'
-                );
-              } catch (error0) {
-                // At this point, we're really fucked up.
-                // Either you can't connect to the facebook server, or your credentials are wrong, or the recipient doesn't exist.
-                // Either way, you're fucked up, literally.
-                logger.error(error0);
-              }
+              await facebook.sendText(recipientID, '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
+            } catch (error0) {
+              // At this point, we're really fucked up.
+              // Either you can't connect to the facebook server, or your credentials are wrong, or the recipient doesn't exist.
+              // Either way, you're fucked up, literally.
+              logger.error(error0);
             }
-            // No matter what, send code 200. (Facebook says to do so...)
-            res.code(200).send();
-          } else {
-            // From `message_deliveries`
-            // TODO
           }
-        });
-      }
-    } catch (error) {
-      logger.error(error);
-      res.send(500);
+          // No matter what, send code 200. (Facebook says to do so...)
+          res.code(200).send('EVENT_RECEIVED');
+        } else {
+          // Return a '404 Not Found' if event is not from a page subscription
+          res.code(404).send('404 Not Found');
+        }
+      });
     }
   });
 
