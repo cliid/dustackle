@@ -3,7 +3,7 @@
     "target": "ES5",
     "experimentalDecorators": true,
     "module": "commonjs",
-    "rootDir": "./src",
+    "rootDir": ".",
     "baseUrl": "./src",
     "paths": {
       "@/lib/*": ["lib/*"],
