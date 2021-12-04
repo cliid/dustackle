@@ -1,10 +1,15 @@
 import { FastifyInstance } from 'fastify';
-import logger from '../logger';
+
+import logger from '@/lib/logger';
 
 const StaticRoute = async (server: FastifyInstance) => {
   server.get('/', {}, async (req, res) => {
     try {
-      res.code(200).send(`Akinaldo.`);
+      res
+        .code(200)
+        .send(
+          `Hi, I'm dustackle. I tackle with dust, especially fine dust. I can also tell you other chemicals causing air pollution. I'm totally free & open source. I'm licensed with the Affero General Public License v3.0. I'm copyleft!`
+        );
     } catch (error) {
       logger.error(error);
       res.send(500);

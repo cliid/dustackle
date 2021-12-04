@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import { fastifyEnv } from 'fastify-env';
-import logger from '../logger';
+
+import logger from '@/lib/logger';
 
 dotenv.config();
 

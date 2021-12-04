@@ -1,7 +1,7 @@
-import logger from '../logger';
-import dialogflow from './dialogflow';
+import dialogflow from '@/lib/dialogflow';
+import logger from '@/lib/logger';
 
-const nlp = async (text: string) => {
+export default async function nlp(text: string) {
   const response = await dialogflow(text, 'ko-KR');
   logger.info('Detected intent');
   const result = response.queryResult!;
@@ -13,6 +13,4 @@ const nlp = async (text: string) => {
     logger.error('  No intent matched.');
   }
   return result;
-};
-
-export default nlp;
+}

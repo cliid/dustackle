@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { VWorldSearchData } from '../types';
 
-const search = async (location: string) => {
+import { VWorldSearchData } from '@/types';
+
+const locationToWGS84 = async (location: string) => {
   const searchData = (
     await axios.get<VWorldSearchData>(
       `https://api.vworld.kr/req/search?${new URLSearchParams({
@@ -18,7 +19,14 @@ const search = async (location: string) => {
     )
   ).data;
 
-  return searchData;
+  if (searchData.response.status === 'NOT_FOUND') {
+    throw new Error('Location not found.');
+  }
+
+  return {
+    x: parseFloat(searchData.response.result.items[0].point.x),
+    y: parseFloat(searchData.response.result.items[0].point.y),
+  };
 };
 
-export default search;
+export default locationToWGS84;

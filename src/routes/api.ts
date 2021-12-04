@@ -1,22 +1,31 @@
 import { FastifyInstance } from 'fastify';
-import { FinedustAttr, WebhookAttr, NLPAttr, WebhookQuerystring } from '../types.d';
-import dustackle from '../utils/dustackle';
-import finedust from '../utils/finedust';
-import nlp from '../utils/nlp';
-import facebook from '../utils/facebook';
-import logger from '../logger';
+
+import air from '@/lib/air';
+import facebook from '@/lib/facebook';
+import logger from '@/lib/logger';
+import messenger from '@/lib/messenger';
+import nlp from '@/lib/nlp';
+import { Messaging } from '@/types';
 
 const APIRoute = async (server: FastifyInstance) => {
-  server.post<{ Body: FinedustAttr }>('/finedust', {}, async (req, res) => {
+  server.post<{
+    Body: {
+      stationName: string;
+    };
+  }>('/air', {}, async (req, res) => {
     try {
-      res.code(200).send(await finedust(req.body.stationName));
+      res.code(200).send(await air(req.body.stationName));
     } catch (error) {
       logger.error(error);
       res.send(500);
     }
   });
 
-  server.post<{ Body: NLPAttr }>('/nlp', {}, async (req, res) => {
+  server.post<{
+    Body: {
+      text: string;
+    };
+  }>('/nlp', {}, async (req, res) => {
     try {
       res.code(200).send(await nlp(req.body.text));
     } catch (error) {
@@ -25,38 +34,58 @@ const APIRoute = async (server: FastifyInstance) => {
     }
   });
 
-  server.post<{ Body: { text: string } }>('/dustackle', {}, async (req, res) => {
+  server.post<{ Body: { text: string } }>('/messenger', {}, async (req, res) => {
     try {
-      res.code(200).send(await dustackle(req.body.text));
+      res.code(200).send(await messenger(req.body.text));
     } catch (error) {
       logger.error(error);
-      res.send(500);
+      res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
     }
   });
 
   // Facebook Messenger Webhook
-  server.post<{ Body: WebhookAttr }>('/webhook', {}, async (req, res) => {
+  server.post<{
+    Body: {
+      object: string;
+      entry: Array<{
+        messaging: Array<Messaging>;
+        id: string;
+        time: number;
+      }>;
+    };
+  }>('/webhook', {}, async (req, res) => {
     try {
       if (req.body.object === 'page') {
-        // Just to be sure...
+        // Just to be sure... it should be `page` for sure.
         // Iterates over each entry - there may be multiple if batched
         req.body.entry!.forEach(async (entry) => {
           // Gets the message. entry.messaging is an array, but
           // will only ever contain one message, so we get index 0
-          const senderID = entry.messaging[0].sender.id;
+          const recipientID = entry.messaging[0].sender.id;
+          // He's the person who gets the message.
           if (entry.messaging[0].message) {
             // If it's a normal message, a.k.a. from the `messages` webhook.
             const { message } = entry.messaging[0];
-            logger.info(`Message: ${message.text}, from User: ${senderID}`);
+            logger.info(`Message: ${message.text}, from User: ${recipientID}`);
             try {
-              const response = await dustackle(message.text);
-              facebook.sendText(senderID, response);
-              res.code(200).send(response);
+              const response = await messenger(message.text);
+              await facebook.sendText(recipientID, response);
             } catch (error) {
               logger.error(error);
-              facebook.sendText(senderID, '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
-              res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.');
+              try {
+                await facebook.sendText(
+                  recipientID,
+                  '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.'
+                );
+              } catch (error0) {
+                // At this point, we're really fucked up.
+                // Either you can't connect to the facebook server, or your credentials are wrong, or the recipient doesn't exist.
+                // Either way, you're fucked up, literally.
+                logger.error(error0);
+              }
             }
+            // No matter what, send code 200. (Facebook says to do so...)
+            res.code(200).send();
           } else {
             // From `message_deliveries`
             // TODO
@@ -69,7 +98,13 @@ const APIRoute = async (server: FastifyInstance) => {
     }
   });
 
-  server.get<{ Querystring: WebhookQuerystring }>('/webhook', {}, async (req, res) => {
+  server.get<{
+    Querystring: {
+      'hub.mode': string;
+      'hub.verify_token': string;
+      'hub.challenge': string;
+    };
+  }>('/webhook', {}, async (req, res) => {
     try {
       // Your verify token. Should be a random string.
       const VERIFY_TOKEN = process.env.FB_WEBHOOK_VERIFY_TOKEN!;

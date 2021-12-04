@@ -1,11 +1,3 @@
-export interface FinedustAttr {
-  stationName: string;
-}
-
-export interface NLPAttr {
-  text: string;
-}
-
 export interface Attachment {
   type: string;
   payload: {
@@ -36,52 +28,6 @@ export interface Messaging {
   delivery?: {
     mids: Array<string>;
     watermark: number;
-  };
-}
-
-export interface WebhookAttr {
-  object: string;
-  entry: Array<{ messaging: Array<Messaging>; id: string; time: number }>;
-}
-
-export interface WebhookQuerystring {
-  'hub.mode': string;
-  'hub.verify_token': string;
-  'hub.challenge': string;
-}
-
-export interface FinedustItem {
-  so2Grade: string;
-  coFlag: null;
-  khaiValue: string;
-  so2Value: string;
-  coValue: string;
-  pm25Flag?: null;
-  pm10Flag: null;
-  o3Grade: string;
-  pm10Value: string;
-  khaiGrade: string;
-  pm25Value?: string;
-  sidoName: string;
-  no2Flag: null;
-  no2Grade: string;
-  o3Flag: null;
-  pm25Grade?: string;
-  so2Flag: null;
-  dataTime: string;
-  coGrade: string;
-  no2Value: string;
-  stationName: string;
-  pm10Grade: string;
-  o3Value: string;
-}
-
-export interface FinedustData {
-  response: {
-    body: {
-      totalCount: number;
-      items: Array<FinedustItem>;
-    };
   };
 }
 
@@ -143,7 +89,67 @@ export interface StationData {
   };
 }
 
-export interface Finedust {
-  pm10: { grade: number; value: number };
-  pm25: { grade: number; value: number };
+// 1: 좋음, 2: 보통, 3: 나쁨, 4: 매우 나쁨
+export enum Grade {
+  GOOD = 1,
+  NORMAL = 2,
+  BAD = 3,
+  WORST = 4,
 }
+
+export interface AirInfo {
+  grade: Grade;
+  value: number;
+}
+
+export interface Air {
+  pm10: AirInfo; // 미세먼지
+  pm25: AirInfo; // 초미세먼지
+  o3: AirInfo; // 오존
+  so2: AirInfo; // 아황산가스
+  no2: AirInfo; // 이산화질소
+  co: AirInfo; // 일산화탄소
+  khai: AirInfo; // 전체적인 대기오염 정도
+}
+
+export interface AirQuality {
+  so2Grade: string;
+  coFlag: null;
+  khaiValue: string;
+  so2Value: string;
+  coValue: string;
+  pm25Flag?: null;
+  pm10Flag: null;
+  o3Grade: string;
+  pm10Value: string;
+  khaiGrade: string;
+  pm25Value?: string;
+  sidoName: string;
+  no2Flag: null;
+  no2Grade: string;
+  o3Flag: null;
+  pm25Grade?: string;
+  so2Flag: null;
+  dataTime: string;
+  coGrade: string;
+  no2Value: string;
+  stationName: string;
+  pm10Grade: string;
+  o3Value: string;
+}
+
+export interface AirData {
+  response: {
+    body: {
+      totalCount: number;
+      items: Array<AirQuality>;
+    };
+  };
+}
+
+export interface Quote {
+  quotation: string;
+  author: string;
+}
+
+export type Quotes = Array<Quote>;

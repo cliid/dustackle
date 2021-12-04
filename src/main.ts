@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { fastifyEnv } from 'fastify-env';
-import logger from './logger';
+
+import logger from '@/lib/logger';
 
 const fastify = Fastify({ logger });
 
@@ -54,8 +55,8 @@ const options = {
 const initialize = async () => {
   fastify.register(fastifyEnv, options);
   await fastify.after();
-  fastify.register(import('./routes/api'), { prefix: '/api' });
-  fastify.register(import('./routes/static'));
+  fastify.register(import('@/routes/api'), { prefix: '/api' });
+  fastify.register(import('@/routes/static'));
 };
 initialize();
 
