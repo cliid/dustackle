@@ -56,35 +56,42 @@ const APIRoute = async (server: FastifyInstance) => {
   }>('/webhook', {}, async (req, res) => {
     if (req.body.object === 'page') {
       // Just to be sure... it should be `page` for sure.
-      // Iterates over each entry - there may be multiple if batched
-      Promise.all(
-        req.body.entry!.map((entry) =>
-          // Run an IIFC
-          (async () => {
-            // Gets the message. entry.messaging is an array, but
-            // will only ever contain one message, so we get index 0
-            const recipientID = entry.messaging[0].sender.id;
-            // He's the person who gets the message.
-            if (entry.messaging[0].message) {
-              // If it's a normal message, a.k.a. from the `messages` webhook.
-              const { message } = entry.messaging[0];
-              logger.info(`Message: ${message.text}, from User: ${recipientID}`);
-              const response = await messenger(message.text);
-              await facebook.sendText(recipientID, response);
-            } else {
-              // From `message_deliveries`
-              // TODO
-            }
-          })()
-        )
-      )
+      // Iterates over each entry, one by one - there may be multiple if batched
+      req.body
+        .entry!.reduce((p, entry) => {
+          return p.then(() =>
+            // It's a Promise-returning IIFE
+            (async () => {
+              // Gets the message. entry.messaging is an array, but
+              // will only ever contain one message, so we get index 0
+              const recipientID = entry.messaging[0].sender.id;
+              // He's the person who gets the message.
+              if (entry.messaging[0].message) {
+                // If it's a normal message, a.k.a. from the `messages` webhook.
+                const { message } = entry.messaging[0];
+                logger.info(`Message: ${message.text}, from User: ${recipientID}`);
+                try {
+                  const response = await messenger(message.text);
+                  await facebook.sendText(recipientID, response);
+                } catch (error) {
+                  logger.error(error);
+                  await facebook.sendText(
+                    recipientID,
+                    '내부적으로 문제가 생긴 것 같습니다. 최대한 신속히 해결하겠습니다.'
+                  );
+                }
+              } else {
+                // From `message_deliveries`
+                // TODO
+              }
+            })()
+          );
+        }, Promise.resolve())
         .then(() => {
           // No matter what, send code 200. (Facebook says to do so...)
           res.code(200).send('EVENT_RECEIVED');
-        })
-        .catch((error) => {
-          logger.error(error);
         });
+      await res;
     } else {
       res.code(404).send('404 Not Found');
     }
