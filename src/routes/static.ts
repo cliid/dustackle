@@ -18,7 +18,9 @@ const StaticRoute = async (server: FastifyInstance) => {
 
   server.get('/privacy', {}, async (req, res) => {
     try {
-      res.code(200).send(`<html lang="ko">
+      res.code(200).type('text/html').send(`
+            <!DOCTYPE html>
+            <html lang="ko">
 
             <head>
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -93,7 +95,9 @@ const StaticRoute = async (server: FastifyInstance) => {
 
   server.get('/terms', {}, async (req, res) => {
     try {
-      res.code(200).send(`<html lang="ko">
+      res.code(200).type('text/html').send(`
+            <!DOCTYPE html>
+            <html lang="ko">
 
             <head>
               <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
