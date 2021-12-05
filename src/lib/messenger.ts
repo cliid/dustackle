@@ -1,5 +1,6 @@
 import proj4 from 'proj4';
 
+import hello from '@/constants/hello';
 import quotes from '@/constants/quotes';
 import air from '@/lib/air';
 import beautifier from '@/lib/beautifier';
@@ -9,6 +10,8 @@ import nlp from '@/lib/nlp';
 import locationToWGS84 from '@/lib/search';
 import nearestFinedustStationName from '@/lib/station';
 import { Grade } from '@/types';
+
+import laughing from '../constants/laughing';
 
 export default async function messenger(request: string, id?: string): Promise<string> {
   const result = await nlp(request);
@@ -67,6 +70,12 @@ export default async function messenger(request: string, id?: string): Promise<s
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
       return `제가 좋아하는 명언 중 하나입니다.\n\n“${quote.quotation}”\n\n— ${quote.author}`;
     }
+    case 'Hello': {
+      return hello[Math.floor(Math.random() * hello.length)];
+    }
+    case 'Laughing': {
+      return laughing[Math.floor(Math.random() * laughing.length)];
+    }
     case 'Start Word Relay': {
       // 끝말잇기 시작
       if (id) {
@@ -78,7 +87,7 @@ export default async function messenger(request: string, id?: string): Promise<s
     default: {
       // TODO: get access to https://developers.facebook.com/docs/messenger-platform/identity/user-profile/ by filing a form
       // TODO: -> change `사용자` to the actual username.
-      return `저도 아직 많이 부족한지라, 사용자 분께서 하신 말씀이 무슨 뜻으로 하신 건지는 잘 이해가 안돼요. 😅\n그래도, 지금도 꾸준히 계속 성장하고, 새로운 기능도 추가되고 있으니, 기대해주세요! 🙌`;
+      return `저도 아직 많이 부족한지라, 사용자 분께서 하신 말씀이 무슨 뜻으로 하신 건지 잘 이해가 안돼요. 😅\n그래도, 꾸준히 성장하고, 새로운 기능도 추가되고 있으니, 기대해주세요! 🙌`;
     }
   }
 }
