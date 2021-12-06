@@ -25,7 +25,6 @@ const naverImplementation = async (location: string) => {
   return {
     x: parseFloat(data.addresses[0].x),
     y: parseFloat(data.addresses[0].y),
-    system: 'wgs84',
   };
 };
 
@@ -51,7 +50,6 @@ const vworldImplementation = async (location: string) => {
   return {
     x: parseFloat(data.response.result.items[0].point.x),
     y: parseFloat(data.response.result.items[0].point.y),
-    system: 'wgs84',
   };
 };
 
@@ -70,11 +68,10 @@ const googleImplementation = async (location: string) => {
   return {
     x: data.results[0].geometry.location.lng,
     y: data.results[0].geometry.location.lat,
-    system: 'wgs84',
   };
 };
 
-const coordinates = async (location: string, implementation: Implementation = 'naver') => {
+const coordinates = async (location: string, implementation: Implementation = 'google') => {
   switch (implementation) {
     case 'naver': {
       return naverImplementation(location);
@@ -89,7 +86,6 @@ const coordinates = async (location: string, implementation: Implementation = 'n
       return {
         x: 127,
         y: 37,
-        system: 'wgs84',
       };
     }
   }
