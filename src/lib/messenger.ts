@@ -6,12 +6,12 @@ import air from '@/lib/air';
 import beautifier from '@/lib/beautifier';
 import facebook from '@/lib/facebook';
 import logger from '@/lib/logger';
+import nearest from '@/lib/nearest';
 import nlp from '@/lib/nlp';
-import locationToWGS84 from '@/lib/search';
-import nearestFinedustStationName from '@/lib/station';
 import { Grade } from '@/types';
 
 import laughing from '../constants/laughing';
+import coordinates from './coordinates';
 
 export default async function messenger(request: string, id?: string): Promise<string> {
   const result = await nlp(request);
@@ -24,7 +24,7 @@ export default async function messenger(request: string, id?: string): Promise<s
         throw new Error('Finedust location not found...');
       }
 
-      const wgs84 = await locationToWGS84(location);
+      const wgs84 = await coordinates(location, 'google');
 
       logger.info(`WGS84: ${wgs84.x}, ${wgs84.y}`);
 
@@ -37,7 +37,7 @@ export default async function messenger(request: string, id?: string): Promise<s
 
       logger.info(`TM: ${tm.x}, ${tm.y}`);
 
-      const stationName = await nearestFinedustStationName(tm);
+      const stationName = await nearest(tm);
       const finedustData = await air(stationName);
       let specialMessage: string;
       switch (finedustData.khai.grade) {
