@@ -2,29 +2,6 @@ import { table } from 'table';
 
 import { Grade } from '@/types';
 
-const config = {
-  border: {
-    topBody: `─`,
-    topJoin: `┬`,
-    topLeft: `┌`,
-    topRight: `┐`,
-
-    bottomBody: `─`,
-    bottomJoin: `┴`,
-    bottomLeft: `└`,
-    bottomRight: `┘`,
-
-    bodyLeft: `│`,
-    bodyRight: `│`,
-    bodyJoin: `│`,
-
-    joinBody: `─`,
-    joinLeft: `├`,
-    joinRight: `┤`,
-    joinJoin: `┼`,
-  },
-};
-
 export const translate = (name: string) => {
   switch (name) {
     case 'pm10': {
@@ -123,5 +100,5 @@ export default function beautifier(air: {
       arr.push([translate(name), gradeInKorean, `${value.value}${metrics(name)}`]);
     });
 
-  return table(arr, config);
+  return table(arr);
 }
