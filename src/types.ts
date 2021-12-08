@@ -226,6 +226,12 @@ export interface Quote {
   author: string;
 }
 
+export interface Coordinates {
+  address: string;
+  x: number;
+  y: number;
+}
+
 export type Quotes = Array<Quote>;
 
 export type Implementation = 'naver' | 'vworld' | 'google';

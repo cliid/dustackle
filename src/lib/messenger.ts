@@ -11,78 +11,130 @@ import nlp from '@/lib/nlp';
 import { Grade } from '@/types';
 
 import laughing from '../constants/laughing';
+import { translate } from './beautifier';
 import coordinates from './coordinates';
+import Josa from './josa';
+
+// location: location query string (ex: 외대부고)
+// order: ex: ['pm10', 'pm25', ...] -> 여기에 있는거만 출력함.
+const airRelated = async (location: string, order: Array<string>) => {
+  const queryType = order.length > 1 ? 'khai' : order[0];
+  const wgs84 = await coordinates(location);
+
+  logger.info(`WGS84: ${wgs84.address}, ${wgs84.x}, ${wgs84.y}`);
+
+  proj4.defs(
+    'TM',
+    '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs +towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43'
+  );
+
+  const tm = proj4('WGS84', 'TM').forward({ x: wgs84.x, y: wgs84.y });
+
+  logger.info(`TM: ${tm.x}, ${tm.y}`);
+
+  const stationName = await nearest(tm);
+  const airData = await air(stationName);
+  let specialMessage: string;
+  const translatedQueryType = translate(queryType);
+  switch (airData[queryType].grade) {
+    case Grade.GOOD: {
+      specialMessage = `우와, 맑은 하늘이네요! 안심하시고 나가셔도 됩니다 🥰`;
+      break;
+    }
+    case Grade.NORMAL: {
+      specialMessage = `${location}의 ${translatedQueryType}${Josa.c(
+        translatedQueryType,
+        '은/는'
+      )} 그럭저럭 괜찮네요! 😉`;
+      break;
+    }
+    case Grade.BAD: {
+      specialMessage = `${location} 가실 때에는 KF94 쓰시는거, 잊지 마세요! 😷`;
+      break;
+    }
+    case Grade.WORST: {
+      specialMessage = `오늘은 ${location} 쪽으로는 가시지 않는게 좋을 것 같아요 😱`;
+      break;
+    }
+    default: {
+      specialMessage = `${location}의 ${translatedQueryType} 데이터에 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다. 😅`;
+    }
+  }
+  const filteredAirData = Object.fromEntries(
+    Object.entries(airData).filter((value) => typeof order.find((value0) => value0 === value[0]) !== 'undefined')
+  );
+  return `⚡ ${location}의 ${translatedQueryType}입니다. ⚡\n(${wgs84.address})\n\n${beautifier(
+    filteredAirData
+  )}\n\n${specialMessage}`;
+};
 
 export default async function messenger(request: string, id?: string): Promise<string> {
   const result = await nlp(request);
 
   switch (result.intent?.displayName) {
-    case 'Finedust': {
+    case '공기':
+    case '미세먼지':
+    case '초미세먼지':
+    case '일산화탄소':
+    case '오존':
+    case '아황산가스':
+    case '이산화질소': {
       // location found
       const location = result.parameters?.fields?.any.stringValue;
       if (location == null) {
-        throw new Error('Finedust location not found...');
+        throw new Error('Location not found...');
       }
 
-      const wgs84 = await coordinates(location, 'google');
+      let order: string[];
 
-      logger.info(`WGS84: ${wgs84.x}, ${wgs84.y}`);
-
-      proj4.defs(
-        'TM',
-        '+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs +towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43'
-      );
-
-      const tm = proj4('WGS84', 'TM').forward({ x: wgs84.x, y: wgs84.y });
-
-      logger.info(`TM: ${tm.x}, ${tm.y}`);
-
-      const stationName = await nearest(tm);
-      const finedustData = await air(stationName);
-      let specialMessage: string;
-      switch (finedustData.khai.grade) {
-        case Grade.GOOD: {
-          specialMessage = `우와, 맑은 하늘이네요! 안심하시고 나가셔도 됩니다 🥰`;
+      switch (result.intent.displayName) {
+        case '공기':
+          order = ['pm10', 'pm25', 'co', 'o3', 'so2', 'no2', 'khai'];
           break;
-        }
-        case Grade.NORMAL: {
-          specialMessage = `${location}의 공기는 그럭저럭 괜찮네요! 😉`;
+        case '미세먼지':
+          order = ['pm10'];
           break;
-        }
-        case Grade.BAD: {
-          specialMessage = `${location} 가실 때에는 KF94 쓰시는거, 잊지 마세요! 😷`;
+        case '초미세먼지':
+          order = ['pm25'];
           break;
-        }
-        case Grade.WORST: {
-          specialMessage = `오늘은 ${location} 쪽으로는 가시지 않는게 좋을 것 같네요;;; 후덜덜... 😱`;
+        case '일산화탄소':
+          order = ['co'];
           break;
-        }
-        default: {
-          specialMessage = `${location}의 미세먼지 데이터에 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다. 😅`;
-        }
+        case '오존':
+          order = ['o3'];
+          break;
+        case '아황산가스':
+          order = ['so2'];
+          break;
+        case '이산화질소':
+          order = ['no2'];
+          break;
+        default:
+          order = [''];
+          break;
       }
-      return `⚡ ${location}의 대기 정보입니다. ⚡\n\n${beautifier(finedustData)}\n${specialMessage}`;
+
+      return airRelated(location, order);
     }
-    case 'Default Finedust': {
-      return '사용자의 위치에 알맞는 미세먼지를 불러오는 기능은 아직 구현중입니다! 사용해주셔서 감사합니다 ;)';
-    }
-    case 'Famous Quotes': {
+    case '명언': {
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
       return `제가 좋아하는 명언 중 하나입니다.\n\n“${quote.quotation}”\n\n— ${quote.author}`;
     }
-    case 'Hello': {
+    case '안녕': {
       return hello[Math.floor(Math.random() * hello.length)];
     }
-    case 'Laughing': {
+    case '웃음': {
       return laughing[Math.floor(Math.random() * laughing.length)];
     }
-    case 'Start Word Relay': {
-      // 끝말잇기 시작
+    case '끝말잇기 시작': {
       if (id) {
         await Promise.resolve().then(() => facebook.sendText(id, '좋아요! 그럼 저부터 시작할게요 :)'));
         return '복숭아';
       }
       return '좋아요! 그럼 저부터 시작할게요 :)';
+    }
+    case '끝말잇기 그만': {
+      return '오예! 제가 이겼어요오 ㅋㅋㅋ';
     }
     default: {
       // TODO: get access to https://developers.facebook.com/docs/messenger-platform/identity/user-profile/ by filing a form

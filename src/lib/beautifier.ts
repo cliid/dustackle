@@ -1,6 +1,6 @@
-import { Air, AirInfo, Grade } from '@/types';
+import { Grade } from '@/types';
 
-const translate = (name: string): string => {
+export const translate = (name: string) => {
   switch (name) {
     case 'pm10': {
       return '미세먼지';
@@ -29,7 +29,7 @@ const translate = (name: string): string => {
   }
 };
 
-const metrics = (name: string): string => {
+export const metrics = (name: string) => {
   switch (name) {
     case 'pm10': {
       return 'μg/㎥';
@@ -58,18 +58,22 @@ const metrics = (name: string): string => {
   }
 };
 
-export default function beautifier(air: Air) {
+export default function beautifier(air: {
+  [key: string]: {
+    grade: Grade;
+    value: number;
+  };
+}) {
   const arr: string[] = [];
   const order = ['pm10', 'pm25', 'co', 'o3', 'so2', 'no2', 'khai'];
   Object.entries(air)
     .sort((a, b) => {
       return order.indexOf(a[0]) - order.indexOf(b[0]);
     })
-    .forEach((entry: [string, AirInfo]) => {
+    .forEach((entry) => {
       const name = entry[0];
       const value = entry[1];
       let gradeInKorean: string;
-      // If it's the overall air quality, just skip. Otherwise, go and append the string to `arr`.
       switch (value.grade) {
         case Grade.GOOD: {
           gradeInKorean = '좋음';
@@ -94,5 +98,5 @@ export default function beautifier(air: Air) {
       arr.push(`${translate(name)}: ${gradeInKorean} (${value.value}${metrics(name)})\n`);
     });
 
-  return `${arr.join('')}`;
+  return `${arr.join('')}`.trim();
 }

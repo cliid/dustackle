@@ -23,6 +23,7 @@ const naverImplementation = async (location: string) => {
   }
 
   return {
+    address: location,
     x: parseFloat(data.addresses[0].x),
     y: parseFloat(data.addresses[0].y),
   };
@@ -48,6 +49,7 @@ const vworldImplementation = async (location: string) => {
   }
 
   return {
+    address: location,
     x: parseFloat(data.response.result.items[0].point.x),
     y: parseFloat(data.response.result.items[0].point.y),
   };
@@ -58,6 +60,7 @@ const googleImplementation = async (location: string) => {
     `https://maps.googleapis.com/maps/api/geocode/json?${new URLSearchParams({
       address: location,
       key: process.env.GOOGLE_CLOUD_API_KEY!,
+      language: 'ko',
     })}`
   );
 
@@ -66,6 +69,7 @@ const googleImplementation = async (location: string) => {
   }
 
   return {
+    address: data.results[0].formatted_address,
     x: data.results[0].geometry.location.lng,
     y: data.results[0].geometry.location.lat,
   };
@@ -84,6 +88,7 @@ const coordinates = async (location: string, implementation: Implementation = 'g
     }
     default: {
       return {
+        address: location,
         x: 127,
         y: 37,
       };

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { Air, AirData, Grade } from '@/types';
+import { AirData, AirInfo, Grade } from '@/types';
 
-export default async function air(stationName: string): Promise<Air> {
+export default async function air(stationName: string): Promise<{ [key: string]: AirInfo }> {
   const queryURL = `http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?${new URLSearchParams(
     {
       ServiceKey: process.env.AIRKOREA_API_SERVICE_KEY!,
@@ -14,8 +14,8 @@ export default async function air(stationName: string): Promise<Air> {
     }
   ).toString()}`;
 
-  const response = (await axios.get<AirData>(queryURL)).data;
-  const item = response.response.body.items[0];
+  const { data } = await axios.get<AirData>(queryURL);
+  const item = data.response.body.items[0];
 
   return {
     pm10: {
