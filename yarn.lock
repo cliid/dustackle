@@ -353,7 +353,7 @@ ajv@^6.10.0, ajv@^6.11.0, ajv@^6.12.4, ajv@^6.12.6:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^8.0.0, ajv@^8.1.0:
+ajv@^8.0.0, ajv@^8.0.1, ajv@^8.1.0:
   version "8.8.2"
   resolved "https://registry.npmjs.org/ajv/-/ajv-8.8.2.tgz"
   integrity sha512-x9VuX+R/jcFj1DHo/fCp99esgGDWiHENrKxaCENuCxpoMCmAt/COCGVDwA7kleEpEzJjDnvh3yGoOuLu0Dtllw==
@@ -2060,6 +2060,11 @@ lodash.merge@^4.6.2:
   resolved "https://registry.npmjs.org/lodash.merge/-/lodash.merge-4.6.2.tgz"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
+lodash.truncate@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
+  integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
+
 log-update@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/log-update/-/log-update-4.0.0.tgz"
@@ -2912,7 +2917,7 @@ string-similarity@^4.0.1:
   resolved "https://registry.npmjs.org/string-similarity/-/string-similarity-4.0.4.tgz"
   integrity sha512-/q/8Q4Bl4ZKAPjj8WerIBJWALKkaPRfrvhfF8k/B23i4nzrlRj2/go1m90In7nG/3XDSbOo0+pu6RvCTM9RGMQ==
 
-string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2:
+string-width@^4.0.0, string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.2, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -3006,6 +3011,17 @@ supports-color@^9.0.2:
   resolved "https://registry.npmjs.org/supports-color/-/supports-color-9.2.1.tgz"
   integrity sha512-Obv7ycoCTG51N7y175StI9BlAXrmgZrFhZOb0/PyjHBher/NmsdBgbbQ1Inhq+gIhz6+7Gb+jWF2Vqi7Mf1xnQ==
 
+table@^6.7.5:
+  version "6.7.5"
+  resolved "https://registry.yarnpkg.com/table/-/table-6.7.5.tgz#f04478c351ef3d8c7904f0e8be90a1b62417d238"
+  integrity sha512-LFNeryOqiQHqCVKzhkymKwt6ozeRhlm8IL1mE8rNUurkir4heF6PzMyRgaTa4tlyPTGGgXuvVOF/OLWiH09Lqw==
+  dependencies:
+    ajv "^8.0.1"
+    lodash.truncate "^4.4.2"
+    slice-ansi "^4.0.0"
+    string-width "^4.2.3"
+    strip-ansi "^6.0.1"
+
 text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/text-table/-/text-table-0.2.0.tgz"
@@ -3077,19 +3093,9 @@ ts-node@^10.4.0:
     make-error "^1.1.1"
     yn "3.1.1"
 
-tsconfig-paths@^3.11.0:
+tsconfig-paths@^3.11.0, tsconfig-paths@^3.12.0:
   version "3.12.0"
   resolved "https://registry.npmjs.org/tsconfig-paths/-/tsconfig-paths-3.12.0.tgz"
-  integrity sha512-e5adrnOYT6zqVnWqZu7i/BQ3BnhzvGbjEjejFXO20lKIKpwTaupkCPgEfv4GZK1IBciJUEhYs3J3p75FdaTFVg==
-  dependencies:
-    "@types/json5" "^0.0.29"
-    json5 "^1.0.1"
-    minimist "^1.2.0"
-    strip-bom "^3.0.0"
-
-tsconfig-paths@^3.12.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.12.0.tgz#19769aca6ee8f6a1a341e38c8fa45dd9fb18899b"
   integrity sha512-e5adrnOYT6zqVnWqZu7i/BQ3BnhzvGbjEjejFXO20lKIKpwTaupkCPgEfv4GZK1IBciJUEhYs3J3p75FdaTFVg==
   dependencies:
     "@types/json5" "^0.0.29"

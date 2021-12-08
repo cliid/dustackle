@@ -25,6 +25,7 @@
     "nodemon": "^2.0.15",
     "pino": "^7.5.0",
     "proj4": "^2.7.5",
+    "table": "^6.7.5",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

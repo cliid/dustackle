@@ -1,4 +1,29 @@
+import { table } from 'table';
+
 import { Grade } from '@/types';
+
+const config = {
+  border: {
+    topBody: `─`,
+    topJoin: `┬`,
+    topLeft: `┌`,
+    topRight: `┐`,
+
+    bottomBody: `─`,
+    bottomJoin: `┴`,
+    bottomLeft: `└`,
+    bottomRight: `┘`,
+
+    bodyLeft: `│`,
+    bodyRight: `│`,
+    bodyJoin: `│`,
+
+    joinBody: `─`,
+    joinLeft: `├`,
+    joinRight: `┤`,
+    joinJoin: `┼`,
+  },
+};
 
 export const translate = (name: string) => {
   switch (name) {
@@ -64,7 +89,7 @@ export default function beautifier(air: {
     value: number;
   };
 }) {
-  const arr: string[] = [];
+  const arr: string[][] = [];
   const order = ['pm10', 'pm25', 'co', 'o3', 'so2', 'no2', 'khai'];
   Object.entries(air)
     .sort((a, b) => {
@@ -95,8 +120,8 @@ export default function beautifier(air: {
           gradeInKorean = 'N/A';
         }
       }
-      arr.push(`${translate(name)}: ${gradeInKorean} (${value.value}${metrics(name)})\n`);
+      arr.push([translate(name), gradeInKorean, `${value.value}${metrics(name)}`]);
     });
 
-  return `${arr.join('')}`.trim();
+  return table(arr, config);
 }

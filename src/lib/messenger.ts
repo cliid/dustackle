@@ -65,7 +65,7 @@ const airRelated = async (location: string, order: Array<string>) => {
   );
   return `⚡ ${location}의 ${translatedQueryType}입니다. ⚡\n(${wgs84.address})\n\n${beautifier(
     filteredAirData
-  )}\n\n${specialMessage}`;
+  )}\n${specialMessage}`;
 };
 
 export default async function messenger(request: string, id?: string): Promise<string> {
