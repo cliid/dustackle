@@ -1,4 +1,4 @@
-import { table } from 'table';
+import { getBorderCharacters, table } from 'table';
 
 import { Grade } from '@/types';
 
@@ -100,5 +100,14 @@ export default function beautifier(air: {
       arr.push([translate(name), gradeInKorean, `${value.value}${metrics(name)}`]);
     });
 
-  return table(arr);
+  return table(arr, {
+    border: getBorderCharacters('void'),
+    columnDefault: {
+      paddingLeft: 0,
+      paddingRight: 1,
+    },
+    drawHorizontalLine: () => false,
+  })
+    .replace(/ {2}/g, '　')
+    .replace(/ /g, '　');
 }

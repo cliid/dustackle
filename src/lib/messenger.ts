@@ -63,9 +63,9 @@ const airRelated = async (location: string, order: Array<string>) => {
   const filteredAirData = Object.fromEntries(
     Object.entries(airData).filter((value) => typeof order.find((value0) => value0 === value[0]) !== 'undefined')
   );
-  return `⚡ ${location}의 ${translatedQueryType}입니다. ⚡\n(${wgs84.address})\n\`\`\`\n${beautifier(
-    filteredAirData
-  )}\`\`\`\n${specialMessage}`;
+  return `⚡ ${location}의 ${translatedQueryType}입니다. ⚡\n\n\`\`\`\n(${
+    wgs84.address
+  })\n\`\`\`\n\n\`\`\`\n${beautifier(filteredAirData)}\`\`\`\n\n${specialMessage}`;
 };
 
 export default async function messenger(request: string, id?: string): Promise<string> {
