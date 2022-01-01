@@ -171,6 +171,10 @@ export enum Grade {
   WORST = 4,
 }
 
+export interface StationAirData {
+  [key: string]: AirInfo;
+}
+
 export interface AirInfo {
   grade: Grade;
   value: number;
@@ -226,8 +230,7 @@ export interface Quote {
   author: string;
 }
 
-export interface Coordinates {
-  address: string;
+export interface Coord {
   x: number;
   y: number;
 }

@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 
-import air from '@/lib/air';
 import facebook from '@/lib/facebook';
+import getStationAir from '@/lib/get_station_air';
 import logger from '@/lib/logger';
 import messenger from '@/lib/messenger';
 import nlp from '@/lib/nlp';
@@ -14,7 +14,7 @@ const APIRoute = async (server: FastifyInstance) => {
     };
   }>('/air', {}, async (req, res) => {
     try {
-      res.code(200).send(await air(req.body.stationName));
+      res.code(200).send(await getStationAir(req.body.stationName));
     } catch (error) {
       logger.error(error);
       res.send(500);

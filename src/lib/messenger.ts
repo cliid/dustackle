@@ -2,18 +2,17 @@ import proj4 from 'proj4';
 
 import hello from '@/constants/hello';
 import quotes from '@/constants/quotes';
-import air from '@/lib/air';
 import beautifier from '@/lib/beautifier';
 import facebook from '@/lib/facebook';
+import getStationAir from '@/lib/get_station_air';
 import logger from '@/lib/logger';
-import nearest from '@/lib/nearest';
+import nearestStationName from '@/lib/nearest_station_name';
 import nlp from '@/lib/nlp';
 import { Grade } from '@/types';
 
 import laughing from '../constants/laughing';
 import { translate } from './beautifier';
 import coordinates from './coordinates';
-import Josa from './josa';
 
 // location: location query string (ex: 외대부고)
 // order: ex: ['pm10', 'pm25', ...] -> 여기에 있는거만 출력함.
@@ -21,7 +20,7 @@ const airRelated = async (location: string, order: Array<string>) => {
   const queryType = order.length > 1 ? 'khai' : order[0];
   const wgs84 = await coordinates(location);
 
-  logger.info(`WGS84: ${wgs84.address}, ${wgs84.x}, ${wgs84.y}`);
+  logger.info(`WGS84: ${wgs84.x}, ${wgs84.y}`);
 
   proj4.defs(
     'TM',
@@ -32,40 +31,35 @@ const airRelated = async (location: string, order: Array<string>) => {
 
   logger.info(`TM: ${tm.x}, ${tm.y}`);
 
-  const stationName = await nearest(tm);
-  const airData = await air(stationName);
-  let specialMessage: string;
+  const stationName = await nearestStationName(tm);
+  const airData = await getStationAir(stationName);
+  let summaryMsg: string;
   const translatedQueryType = translate(queryType);
   switch (airData[queryType].grade) {
     case Grade.GOOD: {
-      specialMessage = `우와, 맑은 하늘이네요! 안심하시고 나가셔도 됩니다 🥰`;
+      summaryMsg = `우와, 맑은 하늘이네요! 🥰`;
       break;
     }
     case Grade.NORMAL: {
-      specialMessage = `${location}의 ${translatedQueryType}${Josa.c(
-        translatedQueryType,
-        '은/는'
-      )} 그럭저럭 괜찮네요! 😉`;
+      summaryMsg = `그럭저럭 괜찮네요! 😉`;
       break;
     }
     case Grade.BAD: {
-      specialMessage = `${location} 가실 때에는 KF94 쓰시는거, 잊지 마세요! 😷`;
+      summaryMsg = `KF94를 쓸 날이군요... 😷`;
       break;
     }
     case Grade.WORST: {
-      specialMessage = `오늘은 ${location} 쪽으로는 가시지 않는게 좋을 것 같아요 😱`;
+      summaryMsg = `${location} 쪽은 가시지 않는게 좋을 것 같아요. 😱`;
       break;
     }
     default: {
-      specialMessage = `${location}의 ${translatedQueryType} 데이터에 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다. 😅`;
+      summaryMsg = `${location}의 ${translatedQueryType} 데이터에 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다. 😅`;
     }
   }
   const filteredAirData = Object.fromEntries(
     Object.entries(airData).filter((value) => typeof order.find((value0) => value0 === value[0]) !== 'undefined')
   );
-  return `⚡ ${location}의 ${translatedQueryType}입니다. ⚡\n\n\`\`\`\n(${
-    wgs84.address
-  })\n\`\`\`\n\n\`\`\`\n${beautifier(filteredAirData)}\`\`\`\n\n${specialMessage}`;
+  return `⚡ ${location} ⚡\n\n${beautifier(filteredAirData)}\n${summaryMsg}`;
 };
 
 export default async function messenger(request: string, id?: string): Promise<string> {

@@ -23,7 +23,7 @@ export const translate = (name: string) => {
       return '일산화탄소';
     }
     case 'khai': {
-      return '통합대기환경수치';
+      return '공기';
     }
     default: {
       return 'N/A';
