@@ -35,9 +35,9 @@ export default async function reply(request: string): Promise<string> {
 
     const translated = translate(code);
 
-    return `${location}의 ${Josa.r(translated.text, '은는')} «${gradeToMsg(data[code].grade)} (${data[code].value}${
-      translated.metric
-    })»입니다.`;
+    return `«${location}»의 ${Josa.r(translated.text, '은는')} "${gradeToMsg(data[code].grade)}" 입니다. (${
+      data[code].value
+    }${translated.metric})`;
   }
 
   if (intent === 'GREETINGS') {
