@@ -3,15 +3,10 @@
     "target": "ES5",
     "experimentalDecorators": true,
     "module": "commonjs",
-    "rootDir": ".",
     "baseUrl": "./src",
     "paths": {
       "@/lib/*": ["lib/*"],
-      "@/api/*": ["api/*"],
-      "@/routes/*": ["routes/*"],
-      "@/utils/*": ["utils/*"],
-      "@/constants/*": ["constants/*"],
-      "@/types": ["types.ts"]
+      "@/routes/*": ["routes/*"]
     },
     "allowJs": true,
     "checkJs": true,

@@ -52,10 +52,10 @@ const Josa = {
   c(word: string, format: string) {
     if (typeof Object.keys(formats).find((value) => value === format) === 'undefined')
       throw new Error('Invalid format!');
-    return (formats as any)[format](word);
+    return (formats as any)[format](word) as string;
   },
   r(word: string, format: string) {
-    return word + this.c(word, format);
+    return (word + this.c(word, format)) as string;
   },
 };
 

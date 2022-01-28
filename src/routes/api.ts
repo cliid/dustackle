@@ -1,42 +1,14 @@
 import { FastifyInstance } from 'fastify';
+import { Messaging } from 'typings';
 
 import facebook from '@/lib/facebook';
-import getStationAir from '@/lib/get_station_air';
 import logger from '@/lib/logger';
-import messenger from '@/lib/messenger';
-import nlp from '@/lib/nlp';
-import { Messaging } from '@/types';
+import reply from '@/lib/reply';
 
 const APIRoute = async (server: FastifyInstance) => {
-  server.post<{
-    Body: {
-      stationName: string;
-    };
-  }>('/air', {}, async (req, res) => {
-    try {
-      res.code(200).send(await getStationAir(req.body.stationName));
-    } catch (error) {
-      logger.error(error);
-      res.send(500);
-    }
-  });
-
-  server.post<{
-    Body: {
-      text: string;
-    };
-  }>('/nlp', {}, async (req, res) => {
-    try {
-      res.code(200).send(await nlp(req.body.text));
-    } catch (error) {
-      logger.error(error);
-      res.send(500);
-    }
-  });
-
   server.post<{ Body: { text: string } }>('/messenger', {}, async (req, res) => {
     try {
-      res.code(200).send(await messenger(req.body.text));
+      res.code(200).send(await reply(req.body.text));
     } catch (error) {
       logger.error(error);
       res.code(500).send('내부적으로 문제가 생긴 것 같습니다. 원활한 서비스 이용에 불편을 끼쳐 드려 죄송합니다.');
@@ -48,14 +20,14 @@ const APIRoute = async (server: FastifyInstance) => {
     Body: {
       object: string;
       entry: Array<{
-        messaging: Array<Messaging>;
+        messaging: Messaging[];
         id: string;
         time: number;
       }>;
     };
   }>('/webhook', {}, async (req, res) => {
     if (req.body.object === 'page') {
-      // Just to be sure... it should be `page` for sure.
+      // Just to be sure.... It should definitely be `page`.
       // Iterates over each entry, one by one - there may be multiple if batched
       req.body
         .entry!.reduce((p, entry) => {
@@ -71,7 +43,7 @@ const APIRoute = async (server: FastifyInstance) => {
                 const { message } = entry.messaging[0];
                 logger.info(`Message: ${message.text}, from User: ${recipientID}`);
                 try {
-                  const response = await messenger(message.text, recipientID);
+                  const response = await reply(message.text);
                   await facebook.sendText(recipientID, response);
                 } catch (error) {
                   logger.error(error);

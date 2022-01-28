@@ -1,12 +1,11 @@
 import axios from 'axios';
+import { AirData, AirQuality, Grade } from 'typings';
 
-import { AirData, Grade, StationAirData } from '@/types';
-
-export default async function getStationAir(stationName: string): Promise<StationAirData> {
+export default async function getAirData(station: string): Promise<AirData> {
   const queryURL = `http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?${new URLSearchParams(
     {
       ServiceKey: process.env.AIRKOREA_API_SERVICE_KEY!,
-      stationName,
+      stationName: station,
       dataTerm: 'DAILY',
       returnType: 'json',
       ver: '1.0',
@@ -14,7 +13,14 @@ export default async function getStationAir(stationName: string): Promise<Statio
     }
   ).toString()}`;
 
-  const { data } = await axios.get<AirData>(queryURL);
+  const { data } = await axios.get<{
+    response: {
+      body: {
+        totalCount: number;
+        items: AirQuality[];
+      };
+    };
+  }>(queryURL);
   const item = data.response.body.items[0];
 
   return {
@@ -23,8 +29,9 @@ export default async function getStationAir(stationName: string): Promise<Statio
       value: parseFloat(item.pm10Value),
     },
     pm25: {
-      grade: parseInt(item.pm25Grade!) as Grade, // B/C we queried with ver = '1.0' --> see API specification.
-      value: parseFloat(item.pm25Value!), // B/C we queried with ver = '1.0' --> see API specification.
+      // B/C we queried with ver = '1.0' --> see API specification.
+      grade: parseInt(item.pm25Grade!) as Grade,
+      value: parseFloat(item.pm25Value!),
     },
     o3: {
       grade: parseInt(item.o3Grade) as Grade,

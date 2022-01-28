@@ -23,78 +23,12 @@ export interface Messaging {
     reply_to?: {
       mid: string;
     };
-    attachments?: Array<Attachment>;
+    attachments?: Attachment[];
   };
   delivery?: {
-    mids: Array<string>;
+    mids: string[];
     watermark: number;
   };
-}
-
-export interface VWorldSearchData {
-  response: {
-    service: {
-      name: string;
-      version: string;
-      operation: string;
-      time: string;
-    };
-    status: string;
-    record: {
-      total: string;
-      current: string;
-    };
-    page: {
-      total: string;
-      current: string;
-      size: string;
-    };
-    result: {
-      crs: 'EPSG:4326' | string;
-      type: 'PLACE' | 'ADDRESS' | 'DISTRICT' | 'ROAD';
-      items: Array<{
-        id: string;
-        title: string;
-        category: string;
-        address: {
-          road: string;
-          parcel: string;
-        };
-        point: {
-          x: string;
-          y: string;
-        };
-      }>;
-    };
-  };
-}
-
-export interface NaverGeocodeData {
-  status: 'OK' | 'INVALID_REQUEST' | 'SYSTEM_ERROR';
-  meta: {
-    totalCount: number;
-    page: number;
-    count: number;
-  };
-  addresses: [
-    {
-      roadAddress: string;
-      jibunAddress: string;
-      englishAddress: string;
-      addressElements: [
-        {
-          types: Array<string>;
-          longName: string;
-          shortName: string;
-          code: string;
-        }
-      ];
-      x: string;
-      y: string;
-      distance: number;
-    }
-  ];
-  errorMessage: string;
 }
 
 export interface GoogleGeocodeData {
@@ -171,7 +105,7 @@ export enum Grade {
   WORST = 4,
 }
 
-export interface StationAirData {
+export interface AirData {
   [key: string]: AirInfo;
 }
 
@@ -216,26 +150,16 @@ export interface AirQuality {
   o3Value: string;
 }
 
-export interface AirData {
-  response: {
-    body: {
-      totalCount: number;
-      items: Array<AirQuality>;
-    };
-  };
-}
-
 export interface Quote {
   quotation: string;
   author: string;
 }
 
-export interface Coord {
+export interface Coordinates {
   x: number;
   y: number;
 }
 
-export type Quotes = Array<Quote>;
+export type Quotes = Quote[];
 
-export type Implementation = 'naver' | 'vworld' | 'google';
-export type System = 'wgs84' | 'tm';
+export type Code = 'khai' | 'pm10' | 'pm25' | 'co' | 'o3' | 'so2' | 'no2';
